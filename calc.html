@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raw Feeding for Dogs</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+            color: #333;
+        }
+        header {
+            background-color: #4CAF50;
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+        main {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        p {
+            line-height: 1.6;
+        }
+        .benefits {
+            margin-top: 40px;
+        }
+        .benefits h2 {
+            color: #4CAF50;
+        }
+        .benefits ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .benefits ul li {
+            margin-bottom: 10px;
+        }
+        footer {
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        .calculator {
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .dog-entry {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .remove-dog {
+            cursor: pointer;
+            color: red;
+            float: right;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Raw Feeding for Dogs</h1>
+    </header>
+    <main>
+        <div id="calculator" class="calculator">
+            <h2>Raw Feeding Cost Calculator</h2>
+            <form id="rawCalculator">
+                <div id="dogEntries">
+                    <div class="dog-entry">
+                        <label for="dogWeight1">Dog's Weight (lbs):</label>
+                        <input type="number" id="dogWeight1" name="dogWeight" required><br>
+                        <label for="activityLevel1">Activity Level:</label>
+                        <select id="activityLevel1" name="activityLevel">
+                            <option value="notActive">Not Active (2%)</option>
+                            <option value="fairlyActive">Fairly Active (2.5-3%)</option>
+                            <option value="working">Working (3-3.5%)</option>
+                        </select>
+                        <span class="remove-dog" onclick="removeDog(this)">Remove</span>
+                    </div>
+                </div>
+                <button type="button" onclick="addDog()">Add Another Dog</button>
+                <input type="submit" value="Calculate">
+            </form>
+            <div id="result"></div>
+        </div>
+    </main>
+    <script>
+    let dogCount = 1;
+
+    function addDog() {
+        dogCount++;
+        const dogEntries = document.getElementById("dogEntries");
+        const newDogEntry = document.createElement("div");
+        newDogEntry.className = "dog-entry";
+        newDogEntry.innerHTML = `
+            <label for="dogWeight${dogCount}">Dog's Weight (lbs):</label>
+            <input type="number" id="dogWeight${dogCount}" name="dogWeight" required><br>
+            <label for="activityLevel${dogCount}">Activity Level:</label>
+            <select id="activityLevel${dogCount}" name="activityLevel">
+                <option value="notActive">Not Active (2%)</option>
+                <option value="fairlyActive">Fairly Active (2.5-3%)</option>
+                <option value="working">Working (3-3.5%)</option>
+            </select>
+            <span class="remove-dog" onclick="removeDog(this)">Remove</span>
+        `;
+        dogEntries.appendChild(newDogEntry);
+    }
+
+    function removeDog(element) {
+        element.parentElement.remove();
+    }
+
+    document.getElementById("rawCalculator").addEventListener("submit", function(event) {
+        event.preventDefault();
+        const results = [];
+        let totalCost = 0;
+
+        for (let i = 1; i <= dogCount; i++) {
+            const dogWeightInput = document.getElementById(`dogWeight${i}`);
+            const activityLevelInput = document.getElementById(`activityLevel${i}`);
+
+            if (dogWeightInput && activityLevelInput) {
+                const dogWeight = parseFloat(dogWeightInput.value);
+                const activityLevel = activityLevelInput.value;
+                let percentage = 0;
+
+                switch (activityLevel) {
+                    case "notActive":
+                        percentage = 0.02;
+                        break;
+                    case "fairlyActive":
+                        percentage = 0.025;
+                        break;
+                    case "working":
+                        percentage = 0.03;
+                        break;
+                }
+
+                const dailyAmount = dogWeight * percentage; // Daily feeding amount in pounds
+                const dailyCost = dailyAmount * 6; // Assuming $6 per pound
+                totalCost += dailyCost;
+                results.push(`Dog ${i}: Estimated daily cost: $${dailyCost.toFixed(2)}, Total ounces to feed daily: ${(dailyAmount * 16).toFixed(2)} oz`);
+            }
+        }
+
+        document.getElementById("result").innerHTML = results.join("<br>") + `<br><strong>Total daily cost for all dogs: $${totalCost.toFixed(2)}</strong>`;
+        });
+    </script>
+</body>
+</html>
